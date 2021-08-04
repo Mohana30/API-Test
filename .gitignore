@@ -1,0 +1,11 @@
+# ignore a .metadata directory
+/.metadata/
+
+# ignore a .settings directory
+/.settings/
+
+# ignore a target directory
+/target/
+
+#ignore .idea
+.idea
