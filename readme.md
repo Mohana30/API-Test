@@ -15,19 +15,19 @@ Write New Test
 	The project directory structure
 		
 		src
-		+ test
-			+ java
-				+ com
-					+anyapiassignment
-						+cucumber 				Test runners and supporting code
-							+serenity			Serenity steps
-							+stepdefinition		Actual step definitions
-						+testbase					
-						+utils
-							
-			+ resources
-				+ features                  
-					+ googlebooks.feature   	Feature files   
+		|_test
+			|_java
+			|	|_com
+			|		|_anyapiassignment
+			|			|_cucumber 			# Test runner class which execute all tests 
+			|			|	|_serenity		# Tests are broken down into reusable steps
+			|			|	|_stepdefinition	# Gherkin scenario maps to step definition method
+			|			|_testbase			# Common initialization and cleanup methods
+			|			|_utils				# Tools and utilities
+			|				
+			|_resources
+				|_features                  
+					|_googlebooks.feature   	#Feature files to store scenarios and feature description to be tested 
 
 
 	Sample feature	
@@ -35,26 +35,21 @@ Write New Test
 		Using cucumber/gherkin language,
 			
 			Scenario: Validate the google books endpoint with invalid bookshelf id
-			When User request google books shelf lists
-			Then Validate the invalid book shelf 101 and "The bookshelf ID could not be found." error message
+			When User request google books shelf lists with 200 response
+			Then Validate the invalid book shelf 101 with 404 response and "The bookshelf ID could not be found." error message
 			
 	Implementation
 	
 		Step definitions makes the script more flexible and compatible, Eg:
 		
-				@When("User request google books shelf lists")
-				public void user_request_google_books_shelf_lists() {
-					steps.getBookShelfList().statusCode(200).spec(ReuseableSpecifications.getGenericResponseSpec()).log().all();	    		
+				@When("User request google books shelf lists with {int} response")
+				public void user_request_google_books_shelf_lists(Integer expStatusCode) {
+					steps.getBookShelfList().statusCode(expStatusCode).spec(ReuseableSpecifications.getGenericResponseSpec()).log().all();	    		
 				}
 
-				@Then("User request the {int} volumes and validate {string}")
-				public void user_request_the_volumes_and_validate(Integer bookshelf_id, String volume_title) {
-					steps.getBookShelfVolumes(bookshelf_id).statusCode(200).body("items.volumeInfo.title", hasItem(volume_title));
-				}
-				
-				@Then("Validate the invalid book shelf {int} and {string} error message")
-				public void validate_the_invalid_book_shelf_and_error_message(Integer bookshelf_id, String error_res_message) {
-					steps.getBookShelfVolumes(bookshelf_id).statusCode(404).body("error.message",equalTo(error_res_message));
+				@Then("Validate the invalid book shelf {int} with {int} response and {string} error message")
+				public void validate_the_invalid_book_shelf_and_error_message(Integer bookshelf_id, Integer expStatusCode, String error_res_message) {
+					steps.getBookShelfVolumes(bookshelf_id).statusCode(expStatusCode).body("error.message",equalTo(error_res_message));
 				}
 				
 		Navigate to Serenity steps for the lean method
